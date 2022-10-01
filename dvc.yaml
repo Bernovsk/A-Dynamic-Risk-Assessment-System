@@ -1,0 +1,38 @@
+stages:
+  data_ingestion:
+    cmd: python ingestion.py
+    deps:
+    - practicedata/dataset1.csv
+    - practicedata/dataset2.csv
+    outs:
+    - ingesteddata/finaldata.csv
+  model_training:
+    cmd: python training.py
+    deps:
+    - ingesteddata/finaldata.csv
+    outs:
+    - practicemodels/trainedmodel.pkl
+  scoring:
+    cmd: python scoring.py
+    deps:
+    - practicemodels/trainedmodel.pkl
+    - testdata/testdata.csv
+    outs:
+    - practicemodels/latestscore.txt
+  deployment:
+    cmd: python deployment.py
+    deps:
+    - ingesteddata/ingestedfiles.txt
+    - practicemodels/latestscore.txt
+    - practicemodels/trainedmodel.pkl
+    outs:
+    - production_deployment/ingestedfiles.txt
+    - production_deployment/latestscore.txt
+    - production_deployment/trainedmodel.pkl
+  reporting:
+    cmd: python reporting.py
+    deps:
+    - production_deployment/trainedmodel.pkl
+    - testdata/testdata.csv
+    outs:
+    - practicemodels/confusionmatrix.png

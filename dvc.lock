@@ -1,0 +1,73 @@
+schema: '2.0'
+stages:
+  data_ingestion:
+    cmd: python ingestion.py
+    deps:
+    - path: practicedata/dataset1.csv
+      md5: 9c4d53e1acd49305e667dc1e0890ebcf
+      size: 364
+    - path: practicedata/dataset2.csv
+      md5: 9cb03e324b811a961687f12ad2e3ef4f
+      size: 402
+    outs:
+    - path: ingesteddata/finaldata.csv
+      md5: 6c2c32d57c2de2ff1c75ba1239e30dc7
+      size: 522
+  model_training:
+    cmd: python training.py
+    deps:
+    - path: ingesteddata/finaldata.csv
+      md5: 6c2c32d57c2de2ff1c75ba1239e30dc7
+      size: 522
+    outs:
+    - path: practicemodels/trainedmodel.pkl
+      md5: 5b3c3fc110dcbb2d147490d00de054e7
+      size: 734
+  scoring:
+    cmd: python scoring.py
+    deps:
+    - path: practicemodels/trainedmodel.pkl
+      md5: 5b3c3fc110dcbb2d147490d00de054e7
+      size: 734
+    - path: testdata/testdata.csv
+      md5: 2b130a79cba17e373f5642ae772df29c
+      size: 164
+    outs:
+    - path: practicemodels/latestscore.txt
+      md5: 7197ec83ced107b7228d379f41be0631
+      size: 20
+  deployment:
+    cmd: python deployment.py
+    deps:
+    - path: ingesteddata/ingestedfiles.txt
+      md5: 956aafa2e927081dd20cb6ae9279efaa
+      size: 26
+    - path: practicemodels/latestscore.txt
+      md5: 7197ec83ced107b7228d379f41be0631
+      size: 20
+    - path: practicemodels/trainedmodel.pkl
+      md5: 5b3c3fc110dcbb2d147490d00de054e7
+      size: 734
+    outs:
+    - path: production_deployment/ingestedfiles.txt
+      md5: 956aafa2e927081dd20cb6ae9279efaa
+      size: 26
+    - path: production_deployment/latestscore.txt
+      md5: 7197ec83ced107b7228d379f41be0631
+      size: 20
+    - path: production_deployment/trainedmodel.pkl
+      md5: 5b3c3fc110dcbb2d147490d00de054e7
+      size: 734
+  reporting:
+    cmd: python reporting.py
+    deps:
+    - path: production_deployment/trainedmodel.pkl
+      md5: 5b3c3fc110dcbb2d147490d00de054e7
+      size: 734
+    - path: testdata/testdata.csv
+      md5: 2b130a79cba17e373f5642ae772df29c
+      size: 164
+    outs:
+    - path: practicemodels/confusionmatrix.png
+      md5: 6f846cf6f5f34bc15c05f511cef5f548
+      size: 8035
